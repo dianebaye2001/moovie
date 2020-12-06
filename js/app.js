@@ -5,19 +5,22 @@ document.addEventListener("DOMContentLoaded", function() { `
   });
   */
 
-  $(document).ready(() => {
+  /*$(document).ready(() => {
       $("#searchForm").on("submit", (e) => {
         let searchQuery = $("#searchQuery").val();
         getMovies(searchQuery)
         e.preventDefault();
       });
   });
+  */
 
   /*let searchButton = document.getElementById("searchButton");*/
   let displayMovie = document.getElementById("displayMovie");
+  let apiKey = "e6b6fe9c"
 
-  function getMovies(searchQuery) {
-      axios.get("http://www.omdbapi.com/?i=tt3896198&apikey=e6b6fe9c&s=" + searchQuery)
+  function getMovies(e) {
+    let searchQuery = $("#searchQuery").val();
+      axios.get("https://www.omdbapi.com/?i=tt3896198&apikey=" + apiKey + "&s=" + searchQuery)
       .then((response) => {
           let output = "";
           console.log(response);
@@ -27,24 +30,33 @@ document.addEventListener("DOMContentLoaded", function() { `
               output += `
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                     <div class="thumbnail">
-                        <img src="${movie.Poster}" alt="" class="">
+                        <img src="${movie.Poster}" alt="" class="" onclick="movieSelected('${movie.imdbID}')">
                     </div>
                     <h5>${movie.Title}(${movie.Year})</h5>
-                    <a onclick="movieSelected('${movie.imdbID}')" class="btn btn-primary" href="movie.html" target="_blank">Movie details</a>
                     </div>
               `
+              //movie details button <a onclick="movieSelected('${movie.imdbID}')" class="btn btn-primary" href="movie.html" target="_blank">Movie details</a>
           });
           //displayMovie.innerHTML = output;
           $("#displayMovie").html(output);
+          e.preventDefault()
 
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+          console.log(err)
+          handleError();
+        });
   }
 
-  /*searchButton.addEventListener("click", getMovies); */
+  searchButton.addEventListener("click", getMovies);
 
 
   /*let singleMovie = document.getElementById("singleMovie"); */
+
+  function handleError() {
+    window.location ="error.html";
+    return false
+  }
 
   function movieSelected(id) {
       sessionStorage.setItem("imdbID", id);
@@ -55,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function() { `
   function getMovie() {
       let movieId = sessionStorage.getItem("imdbID");
 
-      axios.get("http://www.omdbapi.com/?apikey=e6b6fe9c&i=" + movieId)
+      axios.get("https://www.omdbapi.com/?apikey=e6b6fe9c&i=" + movieId)
       .then((response) => {
           console.log(response);
           let movie = response.data;
@@ -63,10 +75,10 @@ document.addEventListener("DOMContentLoaded", function() { `
           let output = `
 
             <div class="row">
-                <div class="col-md-4 col-lg-4">
+                <div class="col-md-12 col-lg-4">
                     <img src="${movie.Poster}">
                 </div>
-                <div class="col-md-8 col-lg-8 rounded">
+                <div class="col-md-12 col-lg-8 rounded">
                     <h2>${movie.Title}</h2>
                     <ul class="list-group">
                         <li class="list-group-item">Genre: ${movie.Genre}</li>
@@ -88,5 +100,9 @@ document.addEventListener("DOMContentLoaded", function() { `
           `
         $("#movie").html(output);
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+          console.log(err)
+          handleError();
+        
+    });
   }
