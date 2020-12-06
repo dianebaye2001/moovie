@@ -25,3 +25,7 @@ a {
 li {
     color: black;
 }
+img {
+     cursor: pointer; 
+    
+}
